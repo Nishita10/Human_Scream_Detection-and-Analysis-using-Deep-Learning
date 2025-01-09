@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scream Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="file"] {
+            width: 100%;
+        }
+        .form-group button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2em;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scream Detection</h1>
+        <form id="screamForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="audioFile">Upload Audio File:</label>
+                <input type="file" id="audioFile" name="audio" accept="audio/*" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Detect Scream</button>
+            </div>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('screamForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData();
+            const audioFile = document.getElementById('audioFile').files[0];
+            formData.append('audio', audioFile);
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/detect-scream', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').textContent = result.result + ": " + result.message;
+                } else {
+                    document.getElementById('result').textContent = "Error: " + result.error;
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = "An error occurred: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
